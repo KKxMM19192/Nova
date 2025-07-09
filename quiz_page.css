@@ -1,0 +1,244 @@
+body {
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(to right, #6699ff, #ff6666);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+#w3c_logo {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    margin: 10px;
+}
+
+.basic_buttons {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+#battle_page{
+    display:none;
+    width: 100%; 
+    height: 100%; 
+    color:white;
+}
+
+#self_name,
+#oppo_name {
+  font-family: "Lucida Handwriting";
+  font-size: 48px;
+  color: inherit;
+}
+
+#self_score,
+#oppo_score {
+  font-family: "Comic Sans MS";
+  color: inherit;
+}
+
+
+/* 全局布局 */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.flex-container {
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0 20px;
+}
+
+.flex-item {
+    width: 20vw;
+    height: 75vh;
+    text-align: center;
+    margin: 0 10px; /* 水平间距 */
+}
+
+/* 左侧容器 */
+.left {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-size: x-large;
+    color: blue;
+    border-radius: 10px;
+}
+
+.left img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 右侧容器 */
+.right {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-size: x-large;
+    color: yellow;
+    border-radius: 10px;
+}
+
+.right img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 中间容器 */
+.middle-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    width: 50vw;
+    height: 70vh;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    padding: 20px;
+    align-items: center;
+}
+
+.middle-container img {
+    width: 100%;
+    height: auto;
+}
+
+/* 按钮容器 */
+.button-container {
+    display:flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 17%;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 20px;
+}
+
+.button-container.btn {
+    padding: 10px 20px;
+    font-size: 48px;
+}
+
+.button-container .btn:hover {
+    background-color: #0056b3;
+    color: white; 
+    transform: scale(1.1);
+}
+
+/* 滚动图片 */
+.scrolling-images-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    background-color: rgba(255,255,255,0);
+    display: none;
+}
+
+.scrolling-images {
+    display: flex;
+    animation: scroll 60s linear;
+}
+
+.scrolling-images img {
+    width: auto;
+    height: 10vh;
+    margin-right: 0px;
+}
+
+@keyframes scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* 页面主体 */
+.ed_page {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60vh; 
+    text-align: center;
+    display: none;
+    color:white;
+}
+
+.ed_page img {
+    width: 80%;
+    max-width: 500px;
+    margin-bottom: 30px;
+}
+
+.ed_page h1{
+    font-family: "Hanken","Comic Sans MS";
+}
+
+#fdb {
+    display: flex;
+    justify-content: center;
+}
+
+/* 按钮样式 */
+.btn-custom {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #33d4ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+.btn-custom:hover {
+    background-color: #28a0b0;
+}
+
+#round_result_modal{
+    text-align: center;
+}
+
+.normal_page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60vh; 
+    text-align: center;
+    display: block;
+    color: white;
+}
+
+/* 计时器 */
+#timer-container {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+#timer-text {
+    font-size: 18px;
+    display: none;
+}
+
+/* 模态框覆盖样式 */
+.modal-header .btn-close {
+    display: none;
+}

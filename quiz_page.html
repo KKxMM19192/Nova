@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <title>Quiz_Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="quiz_page.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <p id = "w3c_logo">
+        <a href="https://jigsaw.w3.org/css-validator/check/referer">
+            <img style="border:0;width:88px;height:31px"
+                src="https://jigsaw.w3.org/css-validator/images/vcss"
+                alt="Valid CSS!" />
+        </a>
+    </p>
+     
+    <!-- BGM Settings -->
+    <audio loop id = "winner_bgm">
+        <source src = "/music/Winner.mp3" type = "audio/mp3">;
+    </audio>
+    <audio loop id = "loser_bgm">
+        <source src = "/music/Unfinished.mp3" type = "audio/mp3">;
+    </audio>
+    <audio id = "end_bgm">
+        <source src = "/music/Ending.flac" type = "audio/flac">;
+    </audio>
+    <audio autoplay loop id="bgm">
+      <source src="/music/Battle.mp3" type="audio/mp3">
+      Audio unsupported.
+    </audio>
+
+    <!-- Basic Buttons -->
+    <div class = "basic_buttons">
+        <button id="gi_button" class="btn btn-info">Info</button>
+        <button id="match_button" class="btn btn-warning">Match</button>
+        <button id="bgm_button" class="btn btn-primary">Pause BGM</button>
+    </div>
+
+    <!-- Normal Page -->
+    <div class = "normal_page" id = "normal_page">
+        <h1>LITTLE QUIZ</h1>
+        <h3>You will engage in a knowledge competition with online users,<br>covering topics ranging from animation, games, mathematics, literature, and more.</h3>
+        <p>If you have sent a challenge, please wait for the opponent to respond</p>
+        <a href="personal_page.html">
+            <button class = "btn-custom">Go Back To Personal Page</button>
+        </a>
+        <a href="introduction_page.html">
+            <button class = "btn-custom">Go To Main Page</button>
+        </a>
+    </div>
+
+    <!-- ED Page -->
+    <div class="ed_page" id = "ed_page">
+        <img src="/img/ed_pic.jpg" alt="Image">
+        <h1>The Outcome Of The Game Is Unimportant <br>What Matters Is The Man Who Play The Game Together</h1>
+        <div id="fdb">
+            <a href="personal_page.html">
+                <button class = "btn-custom">Go Back To Personal Page</button>
+            </a>
+            <a href="introduction_page.html">
+                <button class = "btn-custom">Go To Main Page</button>
+            </a>
+            <a href="quiz_page.html">
+                <button class = "btn-custom">Play Again</button>
+            </a>
+        </div>
+        <p>You can use the match button above to continue the game with the same username!</p>
+    </div>
+
+    <!-- ED -->
+    <div class="scrolling-images-container">
+      <div class="scrolling-images">
+        <img src="/img/genso_carnival.jpg" alt="Image 1">
+      </div>
+    </div>
+
+    <!-- 偷懒用的通用模态框 -->
+    <div class="modal fade" id="genericModal" tabindex="-1" aria-labelledby="genericModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="genericModalLabel">ATTENTION</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="general_button">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通用模态框改，继续偷懒用（拇指笑脸吐舌头） -->
+    <div class="modal fade" id="total_modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="total_modal_title">ATTENTION</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="total_modal_body">
+                    <!-- 自定义内容 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="total_button">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Username Definition-->
+    <div class="modal" id="user_name" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Welcome to quiz!</h5>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Username is required before the game starts.
+                    </p>
+                    <input type="text" id="un_input" class="form-control" placeholder="Enter your name here...">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-success" id="main_page_button">Back To Main Page</button>
+                    <button type="button" class="btn btn-outline-success" id="personal_page_button">Back To Personal Page</button>
+                    <button type="button" class="btn btn-primary" id="un_button">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Show Online Players And Choose Opponent -->
+    <div class="modal" id="online_players_modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Online Users</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Choose one person from them and challenge them!</p>
+                    <ul id="online_players_list" class="list-group">
+                    </ul>
+                    <p>
+                </div>
+                <div class="modal-footer">
+                    <p>You can click the Match button in the upper right corner of the page to bring up the page.</p>
+                    <button type="button" class="btn btn-success" id="refresh_button">Refresh</button>
+                    <button type="button" class="btn btn-secondary" id="later_button">Later</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Challenge Confirmation -->
+    <div class="modal" id="challenge_confirmation_modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Receive A Challenge!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="challenge_confirmation_body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="challenge_accept_button">Accept</button>
+                    <button type="button" class="btn btn-reject" id="challenge_reject_button">Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Battle Page -->
+    <div id = "battle_page">
+        <div class="flex-container">
+            <div class="flex-item left">
+                <img src = "/img/self_head.png" alt = "Failed.">
+                <br><br><br>
+                <div class="text" id="self_name">Self_Name</div>
+                <br><br><br>
+                <div class="score" id="self_score">Score:</div>
+            </div>
+
+            <div class="flex-item right">
+                <img src = "/img/oppo_head.png" alt = "Failed.">
+                <br><br><br>
+                <div class="text" id="oppo_name">Oppo_Name</div>
+                <br><br><br>
+                <div class="score" id="oppo_score">Score:</div>
+            </div>
+
+            <div class="middle-container">
+                <img src="/Questions/Q1.jpeg" alt="Quiz Image">
+            </div>
+
+            <div class="button-container">
+                <button id = "left_op" class="btn btn-secondary"></button>
+                <button id = "middle_op" class="btn btn-secondary"></button>
+                <button id = "right_op" class="btn btn-secondary"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 只用在显示每轮页面 -->
+    <div id="round_result_modal" class="modal"
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        text-align: center;">
+        <div class="modal-content">
+            <h3>Round Result</h3>
+            <p id="round_result_text"></p>
+        </div>
+    </div>
+、
+    <!-- 计时器：简单的也很可爱 -->
+    <div id="timer-container">
+        <span id="timer-text">15s</span>
+    </div>
+</body>
+
+    <!-- All Script Content -->
+    <script>
+        // Connection Settings
+        var socket = io(); 
+        socket.on('connect', function() {
+            console.log('Connected to the server!');
+            console.log('Server version: k19.2; Page version:m19.2');
+        });
+
+        // Game Introduction Button
+        document.getElementById('gi_button').addEventListener('click',function(){
+            //用通用版算了
+            const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+            function setModal(title, content) {
+                document.getElementById('genericModalLabel').innerHTML = title;
+                document.getElementById('modalBody').innerHTML = content;
+            }
+            function showModal(title, content) {
+                setModal(title, content);
+                genericModal.show();
+            }
+            document.getElementById('general_button').addEventListener('click', () => {
+                genericModal.hide();
+            });
+            showModal('Game Rules', 'Quiz questions are shown to both player with answer options. The player who clicks the right answer faster will win the round and gets 2 points, while the opponent gets 0 points. Player who clicks a wrong answer will get 0 points, and the opponent will get 1 point instead. Five questions will be presented, and in the end, the winner is the player with more points. Between two questions, there will be a short break (about 5-10 seconds) to show the result of the round is shown before showing the next question. ');
+        });
+
+        // Match Button
+        document.getElementById('match_button').addEventListener('click',function(){
+            const onlinePlayersModal = new bootstrap.Modal(document.getElementById('online_players_modal'));
+            onlinePlayersModal.show();
+        });
+
+        // BGM Button
+        const bgm_control = document.getElementById('bgm_button');
+        const audio = document.getElementById('bgm');
+        bgm_control.addEventListener('click', function() {
+            if (audio.paused) {
+            audio.play(); 
+            bgm_control.textContent = 'Pause BGM';
+            } else {
+            audio.pause();
+            bgm_control.textContent = 'Play BGM';
+            }
+        });
+
+        // Game Part
+        let current_question = 0;
+        let game_start_time;
+        let answer_timer;
+        let oppoName;
+        
+        function match_update(self_name, oppo_name, self_score, oppo_score) {
+            document.getElementById("self_name").innerText = self_name;
+            document.getElementById("oppo_name").innerText = oppo_name;
+            document.getElementById("self_score").innerText = "Score: " + self_score;
+            document.getElementById("oppo_score").innerText = "Score: " + oppo_score;
+        }
+
+        // 问题放在这
+        const questions = [
+        {
+            image: "/Questions/Q1.jpeg",
+            options: ["Arcueid Brunestud", "Altria Pendragon", "Aozaki Aoko"],
+            correct: 1
+        },
+        {
+            image: "/Questions/Q2.jpeg",
+            options: ["The cake is delicious!", "I love cakes!", "Happy Birthday!"],
+            correct: 2 
+        },
+        {
+            image: "/Questions/Q3.jpeg",
+            options: ["9999", "10000", "10001"],
+            correct: 0
+        },
+        {
+            image: "/Questions/Q4.jpeg",
+            options: ["Electro Dragon", "Baby Dragon", "Inferno Dragon"],
+            correct: 2
+        },
+        {
+            image: "/Questions/Q5.jpeg",
+            options: ["Cien años de soledad", "Oliver Twist", "Thus Spoke Zarathustra"],
+            correct: 0
+        },
+        ];
+
+        const normal_page = document.getElementById('normal_page');
+        const userModal = new bootstrap.Modal(document.getElementById('user_name'));
+        userModal.show();
+
+        document.getElementById('main_page_button').addEventListener('click',function(){
+            window.location.href = 'introduction_page.html';
+        });
+        document.getElementById('personal_page_button').addEventListener('click',function(){
+            window.location.href = 'personal_page.html';
+        });
+        document.getElementById('un_button').addEventListener('click', function() {
+            var username = document.getElementById('un_input').value;
+            if (username) {
+                socket.emit('setUsername', username);
+                userModal.hide();
+                socket.emit('get_online_users');
+            } else {
+                alert("The username cannot be empty!");
+            }
+        });
+
+        // Show Online Players Modal
+        function show_online_players(usersList) {
+            const onlinePlayersList = document.getElementById('online_players_list');
+            onlinePlayersList.innerHTML = ''; // Clear previous list
+
+            usersList.forEach(function(user) {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                listItem.textContent = user; //选的用户是这个user,自己的用户名是un_input.value；
+                
+                const selectButton = document.createElement('button');
+                selectButton.className = 'btn btn-outline-primary btn-sm';
+                selectButton.textContent = 'Challenge';
+                
+                selectButton.addEventListener('click', function() {
+                    //用通用版算了
+                    const modalElement = document.getElementById('online_players_modal');
+                    const onlinePlayersModal = bootstrap.Modal.getInstance(modalElement);   
+                    if (onlinePlayersModal) {
+                        onlinePlayersModal.hide();
+                    }
+                    if (un_input.value == user){
+                        const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+                        document.getElementById('modalBody').innerHTML = `You are not allowed to challenge yourself!`;                            
+                        document.getElementById('general_button').addEventListener('click', () => {
+                            genericModal.hide();
+                        });
+                        genericModal.show();
+                    }else{
+                        if (!in_challenge){
+                            const onlinePlayersModal = new bootstrap.Modal(document.getElementById('online_players_modal'));
+                            onlinePlayersModal.hide();
+                            socket.emit('start_challenge', un_input.value, user); //以发送挑战者、接收挑战者的格式向客户端传参；
+                            //用通用版算了
+                            const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+                            function setModal(oppo_name) {
+                                document.getElementById('modalBody').innerHTML = `Challenge request has been sent to ${oppo_name}, please wait! `;                            
+                            }
+                            function showModal(content) {
+                                setModal(content);
+                                genericModal.show();
+                            }
+                            document.getElementById('general_button').addEventListener('click', () => {
+                                genericModal.hide();
+                            });
+                            showModal(user);
+                        }else{
+                            const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+                            function setModal(content) {
+                                document.getElementById('modalBody').innerHTML = `You are participating in a game, please wait for the game to end before challenging others!`;                            
+                            }
+                            function showModal(content) {
+                                setModal(content);
+                                genericModal.show();
+                            }
+                            document.getElementById('general_button').addEventListener('click', () => {
+                                genericModal.hide();
+                            });
+                            showModal(user);
+                        }
+                        
+                    }
+                });
+                
+                listItem.appendChild(selectButton);
+                onlinePlayersList.appendChild(listItem);
+            });
+
+            const onlinePlayersModal = new bootstrap.Modal(document.getElementById('online_players_modal'));
+            onlinePlayersModal.show();
+        }
+
+        socket.on('online_users', function(usersList) {
+            console.log('All connected users:', usersList);
+            show_online_players(usersList); 
+        });
+
+        document.getElementById('refresh_button').addEventListener('click', function() {
+            // 关闭模态框不然又冻结了呜呜呜
+            const modalElement = document.getElementById('online_players_modal');
+            const onlinePlayersModal = bootstrap.Modal.getInstance(modalElement);   
+            if (onlinePlayersModal) {
+                onlinePlayersModal.hide();
+            }
+            socket.emit('get_online_users'); 
+        });
+
+        document.getElementById('later_button').addEventListener('click', function() {
+            // 关闭模态框不然又冻结了呜呜呜
+            const modalElement = document.getElementById('online_players_modal');
+            const onlinePlayersModal = bootstrap.Modal.getInstance(modalElement);   
+            if (onlinePlayersModal) {
+                onlinePlayersModal.hide();
+            }
+        });
+
+        let currentChallenger = null; // 挑战发起者
+        let currentChallenged = null; // 被挑战者（自己）
+        let in_challenge = false; // 表示是否处于对战状态。接受邀请的话弄成true就好了，顺便在其他广播事件里添加判断逻辑。默认当然是false啦...
+        socket.on('receive_challenge',(challenge_message)=>{
+            if (!in_challenge){
+                console.log(challenge_message);
+                currentChallenger = challenge_message.from; // 保存挑战发起者
+                currentChallenged = challenge_message.to;   // 保存被挑战者（自己）
+                const confirmationBody = document.getElementById('challenge_confirmation_body');
+                confirmationBody.innerHTML = `${currentChallenger} is trying to challenge you!`;
+                const challenge_confirmation_modal = new bootstrap.Modal(document.getElementById('challenge_confirmation_modal'));
+                const modalElement = document.getElementById('online_players_modal');
+                const onlinePlayersModal = bootstrap.Modal.getInstance(modalElement);
+                if (onlinePlayersModal) {
+                    onlinePlayersModal.hide();
+                }
+                challenge_confirmation_modal.show();
+                document.getElementById('challenge_accept_button').addEventListener('click',()=>{
+                    challenge_confirmation_modal.hide();
+                    if (currentChallenger && currentChallenged){
+                        socket.emit('accept_challenge',currentChallenged, currentChallenger);
+                        in_challenge = true;
+                        //这里清空才行，不然关系变不了
+                        currentChallenger = null;
+                        currentChallenged = null;
+                    }   
+                })
+                document.getElementById('challenge_reject_button').addEventListener('click',()=>{
+                    //用通用版算了
+                    const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+                    function setModalBody(title,content) {
+                        document.getElementById('genericModalLabel').innerHTML = title
+                        document.getElementById('modalBody').innerHTML = content;
+                    }
+                    function showModal(title,content) {
+                        setModalBody(title,content);
+                        genericModal.show();
+                    }
+                    document.getElementById('general_button').addEventListener('click', () => {
+                        genericModal.hide();
+                    });
+                    showModal('ATTENTION','You have rejected the challenge!');
+
+                    if (currentChallenger && currentChallenged){
+                        socket.emit('reject_challenge',currentChallenged, currentChallenger);
+                        currentChallenger = null;
+                        currentChallenged = null;
+                        challenge_confirmation_modal.hide();
+                    }
+                });
+            }else{
+                currentChallenger = challenge_message.from; // 保存挑战发起者
+                currentChallenged = challenge_message.to;   // 保存被挑战者（自己）
+                socket.emit('already_in_challenge',currentChallenged, currentChallenger);
+                //这里清空才行，不然关系变不了
+                currentChallenger = null;
+                currentChallenged = null;
+            }
+        })
+
+        socket.on('oppo_busy', function(busy_user){
+            //用通用版算了
+            const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+            function setModalBody(content) {
+                document.getElementById('modalBody').innerHTML = content;
+            }
+            function showModal(content) {
+                setModalBody(content);
+                genericModal.show();
+            }
+            document.getElementById('general_button').addEventListener('click', () => {
+                genericModal.hide();
+            });
+            showModal(`${busy_user} is participating in another game, please wait or challenge other users!`);
+        })
+
+        socket.on('players_matched',function(data){
+            in_challenge = true;
+            const selfName = un_input.value;
+
+            if (data.acceptor === selfName) {
+                oppoName = data.challenger;
+            } else {
+                oppoName = data.acceptor;
+            }
+            //用通用版算了
+            const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+            function setModalBody(content) {
+                document.getElementById('modalBody').innerHTML = content;
+            }
+            function showModal(content) {
+                setModalBody(content);
+                genericModal.show();
+            }
+
+            document.getElementById('general_button').addEventListener('click', () => {
+                genericModal.hide();
+                socket.emit('player_ready', selfName, oppoName);
+                console.log(selfName + ' has ready.');
+            });
+            showModal('If you are ready, please click the button, and the competition will start after both parties are ready.');
+        })
+
+        socket.on('one_not_online',function(){
+            //用通用版算了
+            const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+            function setModalBody(content) {
+                document.getElementById('modalBody').innerHTML = content;
+            }
+            function showModal(content) {
+                setModalBody(content);
+                genericModal.show();
+            }
+            document.getElementById('general_button').addEventListener('click', () => {
+                genericModal.hide();
+            });
+            showModal(`The user is not online! Please refresh the online user list and try again!`);
+        })
+
+        socket.on('challenge_be_rejected',function(){
+            //用通用版算了
+            const genericModal = new bootstrap.Modal(document.getElementById('genericModal'));
+            function setModalBody(content) {
+                document.getElementById('modalBody').innerHTML = content;
+            }
+            function showModal(content) {
+                setModalBody(content);
+                genericModal.show();
+            }
+            document.getElementById('general_button').addEventListener('click', () => {
+                genericModal.hide();
+            });
+            showModal('Challenge has been rejected!');
+        })
+
+        socket.on('game_start', function(data) {
+            console.log("Game started! Opponent:", data.opponent);
+
+            const normal_page = document.getElementById('normal_page');
+            if (normal_page) {
+                normal_page.style.display = 'none';
+            }
+            // 显示 Battle_page
+            const battle_page = document.getElementById('battle_page');
+            if (battle_page) {
+                battle_page.style.display = 'block';  // 显示 battle_page
+            }
+            match_update(un_input.value, data.opponent, 0, 0);
+
+            const ed_page = document.getElementById('ed_page');
+            if (ed_page) {
+                ed_page.style.display = 'none';
+            }
+            const scrollingContainer = document.querySelector('.scrolling-images-container');
+            scrollingContainer.style.display = 'none'; 
+            // 动态插入CSS样式，隐藏关闭按钮
+            var style = document.createElement('style');
+            style.innerHTML = `
+                .modal-header .btn-close {
+                    display: none;
+                }
+            `;
+            document.head.appendChild(style);
+
+            
+            // 换碟了，直接来一波没这么简单
+            const audio = document.getElementById('bgm');
+            if (audio) {
+                audio.pause();
+                audio.innerHTML = '';
+                const newSource = document.createElement('source');
+                newSource.src = '/music/Match_master.mp3';
+                newSource.type = 'audio/mp3';
+                audio.appendChild(newSource);
+                audio.load();
+                audio.play().catch(error => console.log('Audio play failed:', error));
+            } 
+
+            in_challenge = true;
+            current_question = 0;
+            clearTimeout(answer_timer); 
+            show_question(current_question);
+        });
+
+
+        
+        function show_question(index) {
+            const question = questions[index];
+            
+            document.querySelector('.middle-container img').src = question.image;
+            
+            const buttons = document.querySelectorAll('.button-container .btn');
+            buttons.forEach((btn, i) => {
+                btn.textContent = question.options[i];
+                btn.disabled = false;
+                btn.style.backgroundColor = '';
+                btn.onclick = () => handleAnswer(i, question.correct);
+            });
+
+            start_timer();
+        }
+
+        function handleAnswer(selected_index, correct_index) {
+            // 禁用所有按钮,不禁用就瞎几把乱按
+            const buttons = document.querySelectorAll('.button-container .btn');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            // 标记答案对错
+            const is_correct = selected_index === correct_index;
+            buttons[selected_index].style.backgroundColor = is_correct ? '#28a745' : '#dc3545';
+            if (is_correct) {
+                buttons[correct_index].style.backgroundColor = '#28a745';
+            }
+
+            // 计算得分
+            const response_time = Date.now() - game_start_time;
+
+            // 发送结果到服务器
+            socket.emit('submit_result', {
+                player: un_input.value,
+                opponent: document.getElementById('oppo_name').textContent,
+                is_correct: is_correct,
+                response_time: response_time,
+            });
+        }
+        
+        function start_timer() {
+            game_start_time = Date.now();
+            clearTimeout(answer_timer);
+            const timerText = document.getElementById('timer-text');
+            timerText.style.display = "block";
+            answer_timer = setTimeout(() => {
+                // 超时处理
+                const buttons = document.querySelectorAll('.button-container .btn');
+                buttons.forEach(btn => btn.disabled = true);
+                
+                // 发送超时结果
+                socket.emit('submit_result', {
+                    player: un_input.value,
+                    opponent: document.getElementById('oppo_name').textContent,
+                    is_correct: false,
+                    response_time: 16000,
+                    score: 0
+                });
+
+                timerText.textContent = "Time's up!";
+            }, 16000);
+
+            // 每秒更新倒计时
+            const updateTimer = setInterval(() => {
+                const elapsedTime = Date.now() - game_start_time;
+                const remainingTime = 16000 - elapsedTime;
+                
+                if (remainingTime <= 0) {
+                    clearInterval(updateTimer);
+                }
+                
+                timerText.textContent = Math.ceil(remainingTime / 1000) + "s";
+            }, 1000); 
+        }
+
+        // 接收服务器回合完成通知
+        socket.on('round_complete', (data) => {
+            clearTimeout(answer_timer);
+            const resultText = data.is_correct ? "Correct!" : "Wrong Answer!";
+            document.getElementById('round_result_text').innerText = resultText;
+
+            // 显示模态框
+            const modal = document.getElementById('round_result_modal');
+            modal.style.display = 'block';
+            const self_total_score = data.scores[un_input.value];
+            const oppo_total_score = data.scores[oppoName];
+            document.getElementById("self_score").innerText = "Score: " + self_total_score;
+            document.getElementById("oppo_score").innerText = "Score: " + oppo_total_score;
+
+            // 3秒后自动关闭模态框
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 2000);
+        });
+
+        socket.on('prepare_next', (data) => {
+            show_question(data.questionNumber);
+        });
+
+        socket.on('game_over', (data) => {
+            const self_total_score = data.scores[un_input.value];
+            const oppo_total_score = data.scores[oppoName];
+            const winner = data.winner;
+            const final_total_title = `<h2>${un_input.value} VS ${oppoName}<h2>`;
+            const final_total_message = `${un_input.value}'s score: ${self_total_score}<br>
+                                         ${oppoName}'s score: ${oppo_total_score}<br>
+                                         Winner: ${winner}`
+            const timerText = document.getElementById('timer-text');
+            timerText.style.display = "none";
+
+
+
+            //通改
+            const final_modal = new bootstrap.Modal(document.getElementById('total_modal'));
+            function set_total_modal_body(content) {
+                document.getElementById('total_modal_body').innerHTML = content;
+            }
+            function set_total_modal_title(title){
+                document.getElementById('total_modal_title').innerHTML = title;
+            }
+            function show_total_modal(title,content) {
+                set_total_modal_title(title);
+                set_total_modal_body(content);
+                final_modal.show(final_total_title, final_total_message);
+            }
+            show_total_modal(final_total_title,final_total_message);
+
+            const audio = document.getElementById('bgm');
+            const winner_audio = document.getElementById('winner_bgm');
+            const loser_audio = document.getElementById('loser_bgm');
+            if (audio) {
+                audio.pause();
+            } 
+
+
+            in_challenge = false;
+            const battle_page = document.getElementById('battle_page');
+            if (battle_page) {
+                battle_page.style.display = 'none';
+            }
+
+            if (winner == oppoName){
+                loser_audio.play();
+            }else{
+                winner_audio.play();
+            }
+
+            document.getElementById('total_button').addEventListener('click', () => {
+                final_modal.hide();
+                                
+                // ED走起！！！
+                const ed_page = document.getElementById('ed_page');
+                if (ed_page) {
+                    ed_page.style.display = 'block';  
+                }
+                if (!winner_audio.paused) {
+                    winner_audio.pause(); 
+                } else if (!loser_audio.paused) {
+                    loser_audio.pause();
+                }
+                const audio = document.getElementById('bgm');
+                if (audio) {
+                    audio.pause();
+                    audio.innerHTML = '';
+                    const newSource = document.createElement('source');
+                    newSource.src = '/music/Ending.flac';
+                    newSource.type = 'audio/flac';
+                    audio.appendChild(newSource);
+                    audio.load();
+                    audio.play();
+                } 
+                const scrollingContainer = document.querySelector('.scrolling-images-container');
+                scrollingContainer.style.display = 'block'; 
+            });
+        });
+    </script>
+</html>

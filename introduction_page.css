@@ -1,0 +1,86 @@
+#w3c_logo {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    margin: 10px;
+}
+
+body {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+}
+
+#bgm_button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+}
+
+#main_heading {
+    color: #FFFF00;
+    font-family: "Lucida Handwriting";
+}
+
+#welcome_heading {
+    font-family: "Lucida Handwriting";
+    color: #33d4ff;
+}
+
+#tips_heading {
+    font-family: "Lucida Handwriting";
+    color: #1ef7bc;
+}
+
+#about_heading {
+    font-family: "Lucida Handwriting";
+    color: #C8A2C8;
+}
+
+#contact_heading {
+    font-family: "Lucida Handwriting";
+    color: #fd35f4;
+}
+
+p {
+    color: #FFF9E6;
+    font-family: sans-serif;
+    margin-top: 20px;
+}
+
+#scnu {
+    margin-bottom: 50px;
+    width: 300px;
+    height: 250px;
+    float: left;
+}
+
+#uoa {
+    margin-top:50px;
+    width: 300px;
+    height: 300px;
+    float: right;
+}
+
+#bottom_buttons {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#more_button, #quiz_button {
+    font-size: 18px;
+    padding: 10px 20px;
+    margin: 10px;
+    border: none; 
+    border-radius: 5px;
+    color: white; 
+    background-color: orange; 
+    outline: none; 
+    box-shadow: none; 
+}
+
+#quiz_button {
+    background-color: green;
+}
+
+#more_button:hover, #quiz_button:hover {
+    background-color: yellow;
+}
